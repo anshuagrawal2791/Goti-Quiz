@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">Goti</string>
+    <string name="password">Gota</string>
+    <string name="quizzes">[{"quiz_name":"dummy_quiz","no_of_questions":5,"created_at":"2017-03-14T18:30","questions":[
+{"question":"ajhdkfjhdshifddjhfduhvuhiuchvuch",
+"options":["ha","haha","hahaha","hahahaha"]
+},
+{
+  "question":"fiuhiuchiuvc",
+"options":["ha","haha","hahaha"]
+},
+{
+  "question":"ajdhfuisdiufhdsihfiusdhiufdhdisuhfiudhsdiuhfdisuhiudhviuhciuhvciuhiuahkdjfkasfjdahiuhfdkj",
+"options":["ha","haha","hahaha","hahahaha","fdjdisuhf","dufidhfiuds"]
+},
+{
+  "question":"ajhdk",
+"options":["ha","haha","hahaha","hahahaha","dhfdiudhaiudhfiauhdiuahiufdjshfius","djfsiduhfidsuhfiusd"]
+},
+{
+  "question":"ajhdkfjhdshifddjhfduhvuhiuchvuch",
+"options":["true","false"]
+}
+]},{"quiz_name":"dummy_quiz","no_of_questions":5,"created_at":"2017-03-14T18:30","questions":[
+{"question":"ajhdkfjhdshifddjhfduhvuhiuchvuch",
+"options":["ha","haha","hahaha","hahahaha"]
+},
+{
+  "question":"fiuhiuchiuvc",
+"options":["ha","haha","hahaha"]
+},
+{
+  "question":"ajdhfuisdiufhdsihfiusdhiufdhdisuhfiudhsdiuhfdisuhiudhviuhciuhvciuhiuahkdjfkasfjdahiuhfdkj",
+"options":["ha","haha","hahaha","hahahaha","fdjdisuhf","dufidhfiuds"]
+},
+{
+  "question":"ajhdk",
+"options":["ha","haha","hahaha","hahahaha","dhfdiudhaiudhfiauhdiuahiufdjshfius","djfsiduhfidsuhfiusd"]
+},
+{
+  "question":"ajhdkfjhdshifddjhfduhvuhiuchvuch",
+"options":["true","false"]
+}
+]}]</string>
+</resources>
