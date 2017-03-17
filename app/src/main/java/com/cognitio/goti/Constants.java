@@ -18,4 +18,5 @@ public class Constants {
     public static final String QUIZZES_QUESTIONS = "questions";
     public static final String QUIZZES_OPTIONS = "options";
     public static final String INTENT_EXTRA_KEY_QUIZ_TO_PLAY = "quiz_to_play";
+    public static final String INTENT_FINAL_LIST = "final_list";
 }
