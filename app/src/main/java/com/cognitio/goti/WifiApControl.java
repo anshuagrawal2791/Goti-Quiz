@@ -1,10 +1,19 @@
 package com.cognitio.goti;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,6 +21,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is use to handle all Hotspot related information.
@@ -24,6 +34,9 @@ public class WifiApControl {
     private static Method isWifiApEnabled;
     private static Method setWifiApEnabled;
     private static Method getWifiApConfiguration;
+    List<ScanResult> mResults;
+    ListView mNetworksList;
+    Context context;
 
     public static final String WIFI_AP_STATE_CHANGED_ACTION = "android.net.wifi.WIFI_AP_STATE_CHANGED";
 
@@ -60,14 +73,15 @@ public class WifiApControl {
 
     private WifiManager mgr;
 
-    private WifiApControl(WifiManager mgr) {
+    private WifiApControl(WifiManager mgr, Context context) {
         this.mgr = mgr;
+        this.context = context;
     }
 
-    public static WifiApControl getApControl(WifiManager mgr) {
+    public static WifiApControl getApControl(WifiManager mgr,Context context) {
         if (!isApSupported())
             return null;
-        return new WifiApControl(mgr);
+        return new WifiApControl(mgr,context);
     }
 
     public boolean isWifiApEnabled() {
@@ -79,6 +93,67 @@ public class WifiApControl {
         }
     }
 
+    public boolean istWifiEnabled() {
+        if (!mgr.isWifiEnabled() ) {
+            return false;
+        }else{
+            return true;
+        }
+    }
+    public boolean setWifiDisabled(){
+        if(istWifiEnabled()){
+            mgr.setWifiEnabled(false);
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public boolean setWifiEnabled(){
+        if(!istWifiEnabled()){
+            mgr.setWifiEnabled(true);
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public void wifiEnableDialog()
+    {
+        if(!mgr.isWifiEnabled())
+        {
+            final ProgressDialog progDialog = new ProgressDialog(context);
+            progDialog.setMessage("Turning Wifi ON");
+            progDialog.setTitle("WiFi");
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setMessage("Turn on Wifi ?")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
+                        public void onClick(DialogInterface dialog, int which) {
+                            mgr.setWifiEnabled(true);
+                            progDialog.show();
+                            new Thread() {
+                                public void run() {
+                                    try{
+                                        while (!mgr.isWifiEnabled()) {
+
+                                            sleep(100);}
+                                        progDialog.dismiss();
+                                    } catch (Exception e) {}
+
+                                }
+                            }.start();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(context,MainActivity.class);
+                            context.startActivity(intent);
+                        }
+                    });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+    }
     public int getWifiApState() {
         try {
             return (Integer) getWifiApState.invoke(mgr);
@@ -121,6 +196,78 @@ public boolean disableWifiAp(boolean enabled) {
             return false;
         }
     }
+
+
+//    public void showHotspotsList(ListView List){
+//        if(mgr.isWifiEnabled()) {
+//            mReceiver = new WifiReceiver();
+//            scanNetworks();
+////            mNetworksList = mNetworksList==null ? List : mNetworksList;
+////            if(mResults!=null){
+////                mAdapter = new ScanResultsAdapter(mContext,mResults);
+////                mNetworksList.setAdapter(mAdapter);
+////            }
+//        }
+//        else {mgr.setWifiEnabled(true);
+//            showHotspotsList();
+//        }
+//    }
+    public List<ScanResult> getHotspotsList(){
+
+        if(mgr.isWifiEnabled()) {
+
+            if(mgr.startScan()){
+                return mgr.getScanResults();
+            }
+
+        }
+        return null;
+    }
+
+//    public void scanNetworks() {
+//        boolean scan = mgr.startScan();
+//
+//        if(scan) {
+//            mResults = mgr.getScanResults();
+//
+//        } else
+//            switch(mgr.getWifiState()) {
+//                case WifiManager.WIFI_STATE_DISABLING:
+//                    Log.e("scanNetworks","wifi disabling");
+//                    break;
+//                case WifiManager.WIFI_STATE_DISABLED:
+//                    Log.e("scanNetworks","wifi disabled");
+//                    break;
+//                case WifiManager.WIFI_STATE_ENABLING:
+//                    Log.e("scanNetworks","wifi enabling");
+//                    break;
+//                case WifiManager.WIFI_STATE_ENABLED:
+//                    Log.e("scanNetworks", "wifi enabled");
+//                    break;
+//                case WifiManager.WIFI_STATE_UNKNOWN:
+//                    Log.e("scanNetworks","wifi unknown state");
+//                    break;
+//            }
+//
+//    }
+//    class WifiReceiver extends BroadcastReceiver {
+//
+//        public List<ScanResult> getResults() {
+//            return mResults;
+//        }
+//
+//        @Override
+//        public void onReceive(Context c, Intent intent) {
+//            mResults = mgr.getScanResults();
+//            Log.e("onReceive",mResults.toString());
+////            mAdapter = new ScanResultsAdapter(mContext, mResults);
+////            mNetworksList.setAdapter(mAdapter);
+////            mAdapter.notifyDataSetChanged();
+//
+//        }
+//
+//
+//    }
 
     public interface FinishScanListener{
         void onFinishScan(ArrayList<String> resultIPAddr);
@@ -177,4 +324,40 @@ public boolean disableWifiAp(boolean enabled) {
         Thread mythread = new Thread(runnable);
         mythread.start();
     }
+
+    public void setMobileDataEnabled(boolean enabled) {
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            Method method = connectivityManager.getClass().getMethod("setMobileDataEnabled", boolean.class);
+            method.invoke(connectivityManager, enabled);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * check if  Mobile Data With SIM Enabled
+     */
+    public boolean isMobileDataEnabled() {
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            Method method = connectivityManager.getClass().getMethod("getMobileDataEnabled");
+            return (Boolean)method.invoke(connectivityManager);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    public String getSecurityMode(ScanResult scanResult) {
+        final String cap = scanResult.capabilities;
+        final String[] modes = {"WPA", "EAP","WEP" };
+        for (int i = modes.length - 1; i >= 0; i--) {
+            if (cap.contains(modes[i])) {
+                return modes[i];
+            }
+        }
+        return "OPEN";
+    }
+
 }

@@ -27,7 +27,8 @@
         <activity android:name=".Teacher.AvaiableQuizzes" />
         <activity android:name=".Teacher.CreateQuiz" />
         <activity android:name=".Teacher.CreateHotspot" />
-        <activity android:name=".Teacher.Quiz"></activity>
+        <activity android:name=".Teacher.Quiz" />
+        <activity android:name=".Student.Waiting"></activity>
     </application>
 
 </manifest>

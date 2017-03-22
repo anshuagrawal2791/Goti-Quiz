@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,13 +18,26 @@ import android.widget.Toast;
 
 import com.cognitio.goti.Constants;
 import com.cognitio.goti.MainActivity;
+import com.cognitio.goti.Player;
 import com.cognitio.goti.R;
+import com.cognitio.goti.ServerClient;
 import com.cognitio.goti.ToastMessages;
 import com.cognitio.goti.WifiApControl;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 
 public class CreateHotspot extends AppCompatActivity{
 
@@ -35,6 +49,11 @@ public class CreateHotspot extends AppCompatActivity{
     Timer t;
     ArrayList<String> finalList;
     String quizToPlay;
+//    static TreeSet<Player> players;
+    static HashMap<String,String> players;
+    FileServerAsyncTask task;
+    Boolean toExecuteTask=true;
+//    ServerSocket serverSocket;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +61,7 @@ public class CreateHotspot extends AppCompatActivity{
         Intent intent = getIntent();
         if(intent.getExtras()!=null)
         quizToPlay=intent.getStringExtra(Constants.INTENT_EXTRA_KEY_QUIZ_TO_PLAY);
+        Log.e("quiztoplay",quizToPlay);
 
         text = (TextView)findViewById(R.id.text);
         status = (TextView)findViewById(R.id.status);
@@ -53,7 +73,7 @@ public class CreateHotspot extends AppCompatActivity{
         refresh = (Button)findViewById(R.id.refresh);
         start = (Button)findViewById(R.id.start);
         mWifiManager = (WifiManager)getBaseContext().getSystemService(Context.WIFI_SERVICE);
-        wifiApControl= WifiApControl.getApControl(mWifiManager);
+        wifiApControl= WifiApControl.getApControl(mWifiManager,this);
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -96,6 +116,28 @@ public class CreateHotspot extends AppCompatActivity{
                                 start.setVisibility(View.VISIBLE);
                                 connectedClientsTv.setVisibility(View.VISIBLE);
                                 connectedClientsNumber.setVisibility(View.VISIBLE);
+
+                                players = new HashMap<String, String>();
+
+//                                task = new FileServerAsyncTask(CreateHotspot.this){
+//                                    @Override
+//                                    protected void onPostExecute(Object o) {
+//                                        Log.e("players",players.toString());
+////                                        task.execute();
+//                                        new FileServerAsyncTask(CreateHotspot.this).execute();
+//                                    }
+//                                };
+//                                task.execute();
+                                task=new FileServerAsyncTask(CreateHotspot.this);
+                                task.execute();
+
+
+//                                try {
+////                                    serverSocket = new ServerSocket(8888);
+//                                } catch (IOException e) {
+//                                    e.printStackTrace();
+//                                }
+//                                new FileServerAsyncTask(CreateHotspot.this).execute();
 //                                refresh.setVisibility(View.VISIBLE);
                                 t = new Timer();
 //Set the schedule function and rate
@@ -141,6 +183,7 @@ public class CreateHotspot extends AppCompatActivity{
                         }
                         else{
                             t.cancel();
+                            task.cancel(true);
                             Intent intent = new Intent(CreateHotspot.this,Quiz.class);
                             intent.putExtra(Constants.INTENT_EXTRA_KEY_QUIZ_TO_PLAY,quizToPlay);
                             intent.putExtra(Constants.INTENT_FINAL_LIST,finalList);
@@ -161,6 +204,7 @@ public class CreateHotspot extends AppCompatActivity{
             @Override
             public void onFinishScan(ArrayList<String> resultIPAddr) {
                 Log.e("clients",resultIPAddr.size()+"");
+                Log.e("players",players.toString());
                 finalList = new ArrayList<String>(resultIPAddr);
                 connectedClientsNumber.setText(resultIPAddr.size()+"");
                 if(finalList.size()>0)
@@ -170,5 +214,124 @@ public class CreateHotspot extends AppCompatActivity{
 //
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        if(t!=null)
+//        t.cancel();
+    }
+
+
+
+
+    public  class FileServerAsyncTask extends AsyncTask {
+
+        private Context context;
+        private TextView statusText;
+        private String text;
+        private String currentClientIP;
+
+        public FileServerAsyncTask(Context context) {
+            this.context = context;
+
+        }
+
+
+//        @Override
+//        protected void onPostExecute(Object o) {
+////            if (result != null) {
+////                statusText.setText("File copied - " + result);
+////                Intent intent = new Intent();
+////                intent.setAction(android.content.Intent.ACTION_VIEW);
+////                intent.setDataAndType(Uri.parse("file://" + result), "image/*");
+////                context.startActivity(intent);
+////            }
+//            Log.e("text",text);
+//            new FileServerAsyncTask(context).execute();
+////            textview.setText(text);
+////            receive.setEnabled(true);
+//
+//
+//        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+//            textview.setText("fetching...");
+//            receive.setEnabled(false);
+
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            Log.e("player",players.toString());
+            new ServerClient.Send(context,"You are Added",currentClientIP).execute();
+            task=new FileServerAsyncTask(context);
+            task.execute();
+        }
+
+        /**
+         * Start activity that can handle the JPEG image
+         */
+
+
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            try {
+
+                /**
+                 * Create a server socket and wait for client connections. This
+                 * call blocks until a connection is accepted from a client
+                 */
+                ServerSocket serverSocket = new ServerSocket(8888);
+                Socket client = serverSocket.accept();
+
+
+                /**
+                 * If this code is reached, a client has connected and transferred data
+                 * Save the input stream from the client as a JPEG file
+                 */
+//                final File f = new File(Environment.getExternalStorageDirectory() + "/"
+//                        + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis()
+//                        + ".jpg");
+
+//                File dirs = new File(f.getParent());
+//                if (!dirs.exists())
+//                    dirs.mkdirs();
+//                f.createNewFile();
+                BufferedReader r = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                StringBuilder total = new StringBuilder();
+                String line;
+                while ((line = r.readLine()) != null) {
+                    total.append(line).append('\n');
+                }
+                text = total.toString();
+                JSONObject received = new JSONObject(text);
+                if(received.get("method").equals("add"))
+                {
+                    String name = received.getString("name");
+                    String ip = client.getInetAddress().toString().substring(1);
+                    players.put(ip,name);
+                }
+//                    players.add(new Player(received.getString("name"),client.getInetAddress().toString().substring(1)));
+                currentClientIP = client.getInetAddress().toString().substring(1);
+
+//                InputStream inputstream = client.getInputStream();
+//                copyFile(inputstream, new FileOutputStream(f));
+                serverSocket.close();
+//                return f.getAbsolutePath();
+                return null;
+            } catch (IOException e) {
+                Log.e("error", e.getMessage());
+                return null;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
     }
 }
