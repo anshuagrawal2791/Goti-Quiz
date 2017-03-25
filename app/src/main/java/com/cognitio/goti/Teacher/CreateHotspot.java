@@ -236,6 +236,7 @@ public class CreateHotspot extends AppCompatActivity{
         private String text;
         private String currentClientIP;
         private String responseMessage=" ";
+        private String method=" ";
 
         public FileServerAsyncTask(Context context) {
             this.context = context;
@@ -255,6 +256,7 @@ public class CreateHotspot extends AppCompatActivity{
             super.onPostExecute(o);
             Log.e("player",players.toString());
             connectedClientsNumber.setText(players.keySet().size()+"");
+            if(method.equals("add"))
             new ServerClient.Send(context,responseMessage,currentClientIP,8888).execute();
             connectedClientsNumber.setText(players.keySet().size()+"");
             task=new FileServerAsyncTask(context);
@@ -299,6 +301,7 @@ public class CreateHotspot extends AppCompatActivity{
                 }
                 text = total.toString();
                 JSONObject received = new JSONObject(text);
+                method = received.getString("method");
                 if(received.get("method").equals("add"))
                 {
                     String name = received.getString("name");

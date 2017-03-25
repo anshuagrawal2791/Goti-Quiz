@@ -214,10 +214,11 @@ public class Waiting extends AppCompatActivity {
             super.onPostExecute(o);
             Log.e("sent","sent");
 
-            if(receiveTask!=null)
-                receiveTask.cancel(true);
-            receiveTask = new FileServerAsyncTask(Waiting.this);
-            receiveTask.execute();
+            context.startActivity(new Intent(context,StudentHome.class));
+//            if(receiveTask!=null)
+//                receiveTask.cancel(true);
+//            receiveTask = new FileServerAsyncTask(Waiting.this);
+//            receiveTask.execute();
         }
 
         @Override
