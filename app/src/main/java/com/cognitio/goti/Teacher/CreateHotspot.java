@@ -139,16 +139,16 @@ public class CreateHotspot extends AppCompatActivity{
 //                                }
 //                                new FileServerAsyncTask(CreateHotspot.this).execute();
 //                                refresh.setVisibility(View.VISIBLE);
-                                t = new Timer();
-//Set the schedule function and rate
-                                final int[] n = {0};
-                                t.scheduleAtFixedRate(new TimerTask() {
-                                    @Override
-                                    public void run() {
-                                        getClientList();
-
-                                    }
-                                }, 4000, 4000);
+//                                t = new Timer();
+////Set the schedule function and rate
+//                                final int[] n = {0};
+//                                t.scheduleAtFixedRate(new TimerTask() {
+//                                    @Override
+//                                    public void run() {
+//                                        getClientList();
+//
+//                                    }
+//                                }, 4000, 4000);
                             }
                         }
                     }, 10000);
@@ -159,16 +159,16 @@ public class CreateHotspot extends AppCompatActivity{
                 }
             }
         });
-        refresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getClientList();
-            }
-        });
+//        refresh.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                getClientList();
+//            }
+//        });
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getClientList();
+//                getClientList();
                 final ProgressDialog dialog = new ProgressDialog(CreateHotspot.this);
                 dialog.setMessage("Please Wait...");
                 dialog.show();
@@ -177,12 +177,12 @@ public class CreateHotspot extends AppCompatActivity{
                     @Override
                     public void run() {
                         dialog.dismiss();
-                        if(finalList.size()==0){
+                        if(players.keySet().size()==0){
                             start.setVisibility(View.INVISIBLE);
                             Toast.makeText(CreateHotspot.this,"No Clients Connected",Toast.LENGTH_LONG).show();
                         }
                         else{
-                            t.cancel();
+//                            t.cancel();
                             task.cancel(true);
                             Intent intent = new Intent(CreateHotspot.this,Quiz.class);
                             intent.putExtra(Constants.INTENT_EXTRA_KEY_QUIZ_TO_PLAY,quizToPlay);
@@ -199,22 +199,22 @@ public class CreateHotspot extends AppCompatActivity{
 
     }
 
-    public void getClientList() {
-        wifiApControl.getClientList(CreateHotspot.this, true, 3000, new WifiApControl.FinishScanListener() {
-            @Override
-            public void onFinishScan(ArrayList<String> resultIPAddr) {
-                Log.e("clients",resultIPAddr.size()+"");
-                Log.e("players",players.toString());
-                finalList = new ArrayList<String>(resultIPAddr);
-                connectedClientsNumber.setText(resultIPAddr.size()+"");
-                if(finalList.size()>0)
-                    start.setVisibility(View.VISIBLE);
-                else
-                    start.setVisibility(View.INVISIBLE);
-//
-            }
-        });
-    }
+//    public void getClientList() {
+//        wifiApControl.getClientList(CreateHotspot.this, true, 3000, new WifiApControl.FinishScanListener() {
+//            @Override
+//            public void onFinishScan(ArrayList<String> resultIPAddr) {
+//                Log.e("clients",resultIPAddr.size()+"");
+//                Log.e("players",players.toString());
+//                finalList = new ArrayList<String>(resultIPAddr);
+//                connectedClientsNumber.setText(resultIPAddr.size()+"");
+//                if(finalList.size()>0)
+//                    start.setVisibility(View.VISIBLE);
+//                else
+//                    start.setVisibility(View.INVISIBLE);
+////
+//            }
+//        });
+//    }
 
     @Override
     protected void onStop() {
@@ -268,6 +268,7 @@ public class CreateHotspot extends AppCompatActivity{
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
             Log.e("player",players.toString());
+            connectedClientsNumber.setText(players.keySet().size()+"");
             new ServerClient.Send(context,"You are Added",currentClientIP).execute();
             task=new FileServerAsyncTask(context);
             task.execute();
