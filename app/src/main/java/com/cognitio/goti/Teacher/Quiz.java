@@ -9,18 +9,20 @@ import com.cognitio.goti.Constants;
 import com.cognitio.goti.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Quiz extends AppCompatActivity {
     String quizToPlay;
-    ArrayList<String> finalList;
+    HashMap<String,String> players;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
         Intent intent = getIntent();
         quizToPlay=intent.getStringExtra(Constants.INTENT_EXTRA_KEY_QUIZ_TO_PLAY);
-        finalList= (ArrayList<String>)(intent.getSerializableExtra(Constants.INTENT_FINAL_LIST));
-        Log.e("final_list",finalList.toString());
+        players= (HashMap<String,String>)(intent.getSerializableExtra(Constants.INTENT_FINAL_LIST));
+        Log.e("final_list",players.toString());
+        Log.e("quiztoplay",quizToPlay);
 //        Log.e(Constants.INTENT_EXTRA_KEY_QUIZ_TO_PLAY,intent.getStringExtra(Constants.INTENT_EXTRA_KEY_QUIZ_TO_PLAY));
 //        Log.e(Constants.INTENT_EXTRA_KEY_QUIZ_TO_PLAY,intent.getSerializableExtra("clients").toString());
     }

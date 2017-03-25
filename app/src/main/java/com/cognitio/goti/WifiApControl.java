@@ -11,6 +11,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -326,13 +327,43 @@ public boolean disableWifiAp(boolean enabled) {
     }
 
     public void setMobileDataEnabled(boolean enabled) {
-        try {
-            ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            Method method = connectivityManager.getClass().getMethod("setMobileDataEnabled", boolean.class);
-            method.invoke(connectivityManager, enabled);
-        } catch (Exception e) {
-            e.printStackTrace();
+        try
+        {
+            TelephonyManager telephonyService = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
+            Method setMobileDataEnabledMethod = telephonyService.getClass().getDeclaredMethod("setDataEnabled", boolean.class);
+
+            if (null != setMobileDataEnabledMethod)
+            {
+                setMobileDataEnabledMethod.invoke(telephonyService, enabled);
+            }
         }
+        catch (Exception ex)
+        {
+            Log.e("error", "Error setting mobile data state", ex);
+        }
+    }
+    public boolean getMobileDataState()
+    {
+        try
+        {
+            TelephonyManager telephonyService = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
+            Method getMobileDataEnabledMethod = telephonyService.getClass().getDeclaredMethod("getDataEnabled");
+
+            if (null != getMobileDataEnabledMethod)
+            {
+                boolean mobileDataEnabled = (Boolean) getMobileDataEnabledMethod.invoke(telephonyService);
+
+                return mobileDataEnabled;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.e("error", "Error getting mobile data state", ex);
+        }
+
+        return false;
     }
 
     /**

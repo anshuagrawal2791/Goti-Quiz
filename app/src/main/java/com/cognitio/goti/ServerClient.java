@@ -23,11 +23,31 @@ import java.nio.charset.Charset;
  */
 
 public class ServerClient {
+
+    public static class CloseSocket extends AsyncTask{
+        int port;
+        Context context;
+        public CloseSocket(Context context,int port) {
+            this.port=port;
+            this.context=context;
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            try {
+                ServerSocket serverSocket = new ServerSocket(port);
+                serverSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
     public static class Send extends AsyncTask {
         String hello, host;
         Context context;
 
-        public Send(Context context, String hello, String host) {
+        public Send(Context context, String hello, String host,int port) {
             this.hello = hello;
             this.host = host;
             this.context = context;
@@ -46,7 +66,7 @@ public class ServerClient {
                  * port, and timeout information.
                  */
                 socket.bind(null);
-                socket.connect((new InetSocketAddress(host, port)), 500);
+                socket.connect((new InetSocketAddress(host, port)), 100);
 
                 /**
                  * Create a byte stream from a JPEG file and pipe it to the output stream

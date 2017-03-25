@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
@@ -28,7 +29,8 @@
         <activity android:name=".Teacher.CreateQuiz" />
         <activity android:name=".Teacher.CreateHotspot" />
         <activity android:name=".Teacher.Quiz" />
-        <activity android:name=".Student.Waiting"></activity>
+        <activity android:name=".Student.Waiting" />
+        <activity android:name=".Student.Quiz"></activity>
     </application>
 
 </manifest>

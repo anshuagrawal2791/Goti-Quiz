@@ -42,12 +42,8 @@ import java.util.List;
 
 public class StudentHome extends AppCompatActivity {
 
-    RecyclerView recycler;
-    AvailableWifiAdapter adapter;
     WifiApControl wifiApControl;
     WifiManager mWifiManager;
-    BroadcastReceiver receiver;
-    IntentFilter mIntentFilter;
     FileServerAsyncTask receiveTask;
     Send senTask;
 
@@ -86,37 +82,7 @@ public class StudentHome extends AppCompatActivity {
                             }
 
                             senTask=new Send(StudentHome.this, toSend.toString(), resultIPAddr.get(i)) ;
-//                            {
-//                                @Override
-//                                protected void onPreExecute() {
-//                                    super.onPreExecute();
-////                                    submit_name.setEnabled(false);
-//                                }
 //
-//                                @Override
-//                                protected void onPostExecute(Object o) {
-//                                    super.onPostExecute(o);
-////                                    submit_name.setEnabled(true);
-//                                    Log.e("sent","sent");
-//
-//                                    if(receiveTask!=null)
-//                                        receiveTask.cancel(true);
-//                                    receiveTask = new FileServerAsyncTask(StudentHome.this);
-//                                    receiveTask.execute();
-////                                    if (receiveTask != null)
-////                                        receiveTask.cancel(true);
-////                                    receiveTask = new ServerClient.Receive(StudentHome.this) {
-////                                        @Override
-////                                        protected void onPostExecute(Object o) {
-////                                            super.onPostExecute(o);
-////                                            Log.e("message", o + "");
-////                                            startActivity(new Intent(StudentHome.this, Waiting.class));
-////                                        }
-////                                    };
-////                                    receiveTask.execute();
-////
-//                                }
-//                            };
                             senTask.execute();
                         }
                         else{
@@ -132,82 +98,8 @@ public class StudentHome extends AppCompatActivity {
         });
 
 
-//        recycler = (RecyclerView)findViewById(R.id.recycler2);
-//        adapter = new AvailableWifiAdapter(this);
-//        recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
-//        recycler.setAdapter(adapter);
-//        mWifiManager = (WifiManager)getBaseContext().getSystemService(Context.WIFI_SERVICE);
-//        wifiApControl= WifiApControl.getApControl(mWifiManager,this);
-//        if(wifiApControl.isWifiApEnabled()) {
-//            wifiApControl.setWifiApEnabled(null,false);
-//        }
-//
-//        wifiApControl.setWifiDisabled();
-//
-//        wifiApControl.wifiEnableDialog();
-//        receiver = new BroadcastReceiver() {
-//
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//                // TODO Auto-generated method stub
-//                final String action = intent.getAction();
-//                if(action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
-//                {
-//                    List<ScanResult> results = wifiApControl.getHotspotsList();
-//                    Log.e("scanresults",results.toString());
-//                    adapter.setList(results);
-////                    for (ScanResult result : results) {
-////                        //Toast.makeText(getApplicationContext(), result.SSID + " " + result.level,
-////                        //        Toast.LENGTH_SHORT).show();
-////                        if(result.SSID.equalsIgnoreCase("SSID"))
-////                        {
-////                            Toast.makeText(getApplicationContext(),"Found SSID",Toast.LENGTH_SHORT).show();
-////                            if(!wifiApControl.isConnectToHotSpotRunning)
-////                                wifiApControl.connectToHotspot("SSID","");
-////                            try{
-////                                unregisterReceiver(receiver);
-////                                break;
-////                            }catch(Exception e)
-////                            {
-////                                //trying to unregister twice? need vary careful about this.
-////                            }
-////
-////                        }
-////                    }
-//                }
-//            }
-//
-//        };
-//        mIntentFilter = new IntentFilter();
-//        mIntentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-//        registerReceiver(receiver,  mIntentFilter);
-
-
 
     }
-
-
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        try{
-//        unregisterReceiver(receiver);}
-//        catch (Exception e){
-//            Log.e("Error",e.toString());
-//        }
-//    }
-
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        unregisterReceiver(receiver);
-//    }
-//
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        registerReceiver(receiver,mIntentFilter);
-//    }
 public  class FileServerAsyncTask extends AsyncTask {
 
     private Context context;
@@ -222,30 +114,9 @@ public  class FileServerAsyncTask extends AsyncTask {
     }
 
 
-//        @Override
-//        protected void onPostExecute(Object o) {
-////            if (result != null) {
-////                statusText.setText("File copied - " + result);
-////                Intent intent = new Intent();
-////                intent.setAction(android.content.Intent.ACTION_VIEW);
-////                intent.setDataAndType(Uri.parse("file://" + result), "image/*");
-////                context.startActivity(intent);
-////            }
-//            Log.e("text",text);
-//            new FileServerAsyncTask(context).execute();
-////            textview.setText(text);
-////            receive.setEnabled(true);
-//
-//
-//        }
-
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-//            textview.setText("fetching...");
-//            receive.setEnabled(false);
-
-
     }
 
     @Override
@@ -380,6 +251,7 @@ public  class FileServerAsyncTask extends AsyncTask {
             } catch (IOException e) {
                 //catch logic
             }
+
 
 /**
  * Clean up any open sockets when done

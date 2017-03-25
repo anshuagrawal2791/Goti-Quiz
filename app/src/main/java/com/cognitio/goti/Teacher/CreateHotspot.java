@@ -35,6 +35,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
@@ -169,29 +170,31 @@ public class CreateHotspot extends AppCompatActivity{
             @Override
             public void onClick(View view) {
 //                getClientList();
-                final ProgressDialog dialog = new ProgressDialog(CreateHotspot.this);
-                dialog.setMessage("Please Wait...");
-                dialog.show();
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog.dismiss();
-                        if(players.keySet().size()==0){
-                            start.setVisibility(View.INVISIBLE);
-                            Toast.makeText(CreateHotspot.this,"No Clients Connected",Toast.LENGTH_LONG).show();
-                        }
-                        else{
-//                            t.cancel();
-                            task.cancel(true);
-                            Intent intent = new Intent(CreateHotspot.this,Quiz.class);
-                            intent.putExtra(Constants.INTENT_EXTRA_KEY_QUIZ_TO_PLAY,quizToPlay);
-                            intent.putExtra(Constants.INTENT_FINAL_LIST,finalList);
-                            startActivity(intent);
-                        }
+                if (players.keySet().size() == 0) {
+//                            start.setVisibility(View.INVISIBLE);
+                    Toast.makeText(CreateHotspot.this, "No Clients Connected", Toast.LENGTH_LONG).show();
+                } else {
+                    final ProgressDialog dialog = new ProgressDialog(CreateHotspot.this);
+                    dialog.setMessage("Please Wait...");
+                    dialog.show();
+                    for (Map.Entry<String, String> entry : players.entrySet()) {
+                        new ServerClient.Send(CreateHotspot.this,"quiz_started",entry.getKey(),8888).execute();
                     }
-                },3000);
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+                            task.cancel(true);
+                            Intent intent = new Intent(CreateHotspot.this, Quiz.class);
+                            intent.putExtra(Constants.INTENT_EXTRA_KEY_QUIZ_TO_PLAY, quizToPlay);
+                            intent.putExtra(Constants.INTENT_FINAL_LIST, players);
+                            startActivity(intent);
 
+                        }
+                    }, 3000);
+
+                }
             }
         });
 
@@ -232,29 +235,12 @@ public class CreateHotspot extends AppCompatActivity{
         private TextView statusText;
         private String text;
         private String currentClientIP;
+        private String responseMessage=" ";
 
         public FileServerAsyncTask(Context context) {
             this.context = context;
 
         }
-
-
-//        @Override
-//        protected void onPostExecute(Object o) {
-////            if (result != null) {
-////                statusText.setText("File copied - " + result);
-////                Intent intent = new Intent();
-////                intent.setAction(android.content.Intent.ACTION_VIEW);
-////                intent.setDataAndType(Uri.parse("file://" + result), "image/*");
-////                context.startActivity(intent);
-////            }
-//            Log.e("text",text);
-//            new FileServerAsyncTask(context).execute();
-////            textview.setText(text);
-////            receive.setEnabled(true);
-//
-//
-//        }
 
         @Override
         protected void onPreExecute() {
@@ -269,7 +255,8 @@ public class CreateHotspot extends AppCompatActivity{
             super.onPostExecute(o);
             Log.e("player",players.toString());
             connectedClientsNumber.setText(players.keySet().size()+"");
-            new ServerClient.Send(context,"You are Added",currentClientIP).execute();
+            new ServerClient.Send(context,responseMessage,currentClientIP,8888).execute();
+            connectedClientsNumber.setText(players.keySet().size()+"");
             task=new FileServerAsyncTask(context);
             task.execute();
         }
@@ -317,6 +304,12 @@ public class CreateHotspot extends AppCompatActivity{
                     String name = received.getString("name");
                     String ip = client.getInetAddress().toString().substring(1);
                     players.put(ip,name);
+                    responseMessage="Successfully added!";
+                }
+                else if(received.get("method").equals("remove")){
+                    String ip = client.getInetAddress().toString().substring(1);
+                    players.remove(ip);
+                    responseMessage = "Successfully removed!";
                 }
 //                    players.add(new Player(received.getString("name"),client.getInetAddress().toString().substring(1)));
                 currentClientIP = client.getInetAddress().toString().substring(1);
