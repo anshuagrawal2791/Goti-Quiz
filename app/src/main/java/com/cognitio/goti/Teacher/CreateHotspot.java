@@ -227,7 +227,12 @@ public class CreateHotspot extends AppCompatActivity{
     }
 
 
+    @Override
+    protected void onDestroy() {
+        task.cancel(true);
+        super.onDestroy();
 
+    }
 
     public  class FileServerAsyncTask extends AsyncTask {
 
@@ -251,6 +256,7 @@ public class CreateHotspot extends AppCompatActivity{
 
         }
 
+
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
@@ -259,9 +265,13 @@ public class CreateHotspot extends AppCompatActivity{
             if(method.equals("add"))
             new ServerClient.Send(context,responseMessage,currentClientIP,8888).execute();
             connectedClientsNumber.setText(players.keySet().size()+"");
+            if(!isCancelled()){
+                Log.e("new receiver","created");
             task=new FileServerAsyncTask(context);
-            task.execute();
+            task.execute();}
+
         }
+
 
         /**
          * Start activity that can handle the JPEG image
