@@ -66,7 +66,7 @@ public class ServerClient {
                  * port, and timeout information.
                  */
                 socket.bind(null);
-                socket.connect((new InetSocketAddress(host, port)), 100);
+                socket.connect((new InetSocketAddress(host, port)), 500);
 
                 /**
                  * Create a byte stream from a JPEG file and pipe it to the output stream
