@@ -29,13 +29,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +48,7 @@ public class StudentHome extends AppCompatActivity {
 
     WifiApControl wifiApControl;
     WifiManager mWifiManager;
-    FileServerAsyncTask receiveTask;
+//    FileServerAsyncTask receiveTask;
     Send senTask;
 
     EditText name;
@@ -57,7 +61,7 @@ public class StudentHome extends AppCompatActivity {
         submit_name = (Button)findViewById(R.id.submit_name);
         mWifiManager = (WifiManager)getBaseContext().getSystemService(Context.WIFI_SERVICE);
         wifiApControl= WifiApControl.getApControl(mWifiManager,this);
-        wifiApControl.setMobileDataEnabled(false);
+//        wifiApControl.setMobileDataEnabled(false);
 
 
         submit_name.setOnClickListener(new View.OnClickListener() {
@@ -100,106 +104,108 @@ public class StudentHome extends AppCompatActivity {
 
 
     }
-public  class FileServerAsyncTask extends AsyncTask {
-
-    private Context context;
-    private TextView statusText;
-    private String text;
-    private String currentClientIP;
-    private ServerSocket serverSocket;
-
-    public FileServerAsyncTask(Context context) {
-        this.context = context;
-
-    }
-
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-    }
-
-    @Override
-    protected void onPostExecute(Object o) {
-        super.onPostExecute(o);
-        if(text!=null) {
-            Log.e("response", text);
-            Toast.makeText(context,"You're added!",Toast.LENGTH_LONG).show();
-            context.startActivity(new Intent(context,Waiting.class));
-        }
-//        new ServerClient.Send(context,"You are Added",currentClientIP).execute();
-//        task=new CreateHotspot.FileServerAsyncTask(context);
-//        task.execute();
-    }
-
-    /**
-     * Start activity that can handle the JPEG image
-     */
-
-
-
-    @Override
-    protected Object doInBackground(Object[] objects) {
-        try {
-
-            /**
-             * Create a server socket and wait for client connections. This
-             * call blocks until a connection is accepted from a client
-             */
-             serverSocket = new ServerSocket(8888);
-            serverSocket.setSoTimeout(2000);
-            Socket client = serverSocket.accept();
-
-
-            /**
-             * If this code is reached, a client has connected and transferred data
-             * Save the input stream from the client as a JPEG file
-             */
-//                final File f = new File(Environment.getExternalStorageDirectory() + "/"
-//                        + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis()
-//                        + ".jpg");
-
-//                File dirs = new File(f.getParent());
-//                if (!dirs.exists())
-//                    dirs.mkdirs();
-//                f.createNewFile();
-            BufferedReader r = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            StringBuilder total = new StringBuilder();
-            String line;
-            while ((line = r.readLine()) != null) {
-                total.append(line).append('\n');
-            }
-            text = total.toString();
-//            players.add(new Player(text,client.getInetAddress()+""));
-            currentClientIP = client.getInetAddress().toString().substring(1);
-
-//                InputStream inputstream = client.getInputStream();
-//                copyFile(inputstream, new FileOutputStream(f));
-            serverSocket.close();
-//                return f.getAbsolutePath();
-            return null;
-        } catch (IOException e) {
-            Log.e("error", e.toString());
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    // some code #3 (Write your code here to run in UI thread)
-                    Toast.makeText(context,"Looks like you're connected to the wrong hotspot!",Toast.LENGTH_LONG).show();
-
-                }
-            });
-
-            try {
-                serverSocket.close();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            return null;
-        }
-    }
-}
+//public  class FileServerAsyncTask extends AsyncTask {
+//
+//    private Context context;
+//    private TextView statusText;
+//    private String text;
+//    private String currentClientIP;
+//    private ServerSocket serverSocket;
+//
+//    public FileServerAsyncTask(Context context) {
+//        this.context = context;
+//
+//    }
+//
+//
+//    @Override
+//    protected void onPreExecute() {
+//        super.onPreExecute();
+//    }
+//
+//    @Override
+//    protected void onPostExecute(Object o) {
+//        super.onPostExecute(o);
+//        if(text!=null) {
+//            Log.e("response", text);
+//            Toast.makeText(context,"You're added!",Toast.LENGTH_LONG).show();
+//            context.startActivity(new Intent(context,Waiting.class));
+//        }
+////        new ServerClient.Send(context,"You are Added",currentClientIP).execute();
+////        task=new CreateHotspot.FileServerAsyncTask(context);
+////        task.execute();
+//    }
+//
+//    /**
+//     * Start activity that can handle the JPEG image
+//     */
+//
+//
+//
+//    @Override
+//    protected Object doInBackground(Object[] objects) {
+//        try {
+//
+//            /**
+//             * Create a server socket and wait for client connections. This
+//             * call blocks until a connection is accepted from a client
+//             */
+//             serverSocket = new ServerSocket(8888);
+//            serverSocket.setSoTimeout(2000);
+//            Socket client = serverSocket.accept();
+//
+//
+//            /**
+//             * If this code is reached, a client has connected and transferred data
+//             * Save the input stream from the client as a JPEG file
+//             */
+////                final File f = new File(Environment.getExternalStorageDirectory() + "/"
+////                        + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis()
+////                        + ".jpg");
+//
+////                File dirs = new File(f.getParent());
+////                if (!dirs.exists())
+////                    dirs.mkdirs();
+////                f.createNewFile();
+//            BufferedReader r = new BufferedReader(new InputStreamReader(client.getInputStream()));
+//            StringBuilder total = new StringBuilder();
+//            String line;
+//            while ((line = r.readLine()) != null) {
+//                total.append(line).append('\n');
+//            }
+//            text = total.toString();
+////            players.add(new Player(text,client.getInetAddress()+""));
+//            currentClientIP = client.getInetAddress().toString().substring(1);
+//
+////                InputStream inputstream = client.getInputStream();
+////                copyFile(inputstream, new FileOutputStream(f));
+//            serverSocket.close();
+////                return f.getAbsolutePath();
+//            return null;
+//        } catch (IOException e) {
+//            Log.e("error", e.toString());
+//            runOnUiThread(new Runnable() {
+//                public void run() {
+//                    // some code #3 (Write your code here to run in UI thread)
+//                    Toast.makeText(context,"Looks like you're connected to the wrong hotspot!",Toast.LENGTH_LONG).show();
+//
+//                }
+//            });
+//
+//            try {
+//                serverSocket.close();
+//            } catch (IOException e1) {
+//                e1.printStackTrace();
+//            }
+//            return null;
+//        }
+//    }
+//}
     public  class Send extends AsyncTask {
         String hello, host;
         Context context;
+        Boolean approved=false;
+        String response;
 
         public Send(Context context, String hello, String host) {
             this.hello = hello;
@@ -211,11 +217,18 @@ public  class FileServerAsyncTask extends AsyncTask {
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
             Log.e("sent","sent");
+            if(approved){
+            Toast.makeText(context,"You're added!",Toast.LENGTH_LONG).show();
+            context.startActivity(new Intent(context,Waiting.class));}
+            else{
+                Toast.makeText(context,"you don't seem to be connected to the right hotspot",Toast.LENGTH_LONG).show();
+            }
 
-            if(receiveTask!=null)
-                receiveTask.cancel(true);
-            receiveTask = new FileServerAsyncTask(StudentHome.this);
-            receiveTask.execute();
+//            if(receiveTask!=null)
+//                receiveTask.cancel(true);
+//            receiveTask = new FileServerAsyncTask(StudentHome.this);
+//            receiveTask.execute();
+
         }
 
         @Override
@@ -230,23 +243,57 @@ public  class FileServerAsyncTask extends AsyncTask {
                  * port, and timeout information.
                  */
                 socket.bind(null);
-                socket.connect((new InetSocketAddress(host, port)), 500);
+                socket.connect((new InetSocketAddress(host, port)), 100);
 
                 /**
                  * Create a byte stream from a JPEG file and pipe it to the output stream
                  * of the socket. This data will be retrieved by the server device.
                  */
-                OutputStream outputStream = socket.getOutputStream();
-                outputStream.write(hello.getBytes(Charset.forName("UTF-8")));
+//                OutputStream outputStream = socket.getOutputStream();
+//                outputStream.write(hello.getBytes(Charset.forName("UTF-8")));
+
+
+//                outputStream.close();
+//                OutputStream os = socket.getOutputStream();
+//                OutputStreamWriter osw = new OutputStreamWriter(os);
+//                BufferedWriter bw = new BufferedWriter(osw);
+//                bw.write(hello);
+////                bw.flush();
+//                outputStream.flush();
+                OutputStream os = socket.getOutputStream();
+                OutputStreamWriter osw = new OutputStreamWriter(os);
+                BufferedWriter bw = new BufferedWriter(osw);
+                bw.write(hello);
+                bw.newLine();
+                bw.flush();
+
+                InputStream is = socket.getInputStream();
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader br = new BufferedReader(isr);
+                response = br.readLine();
+                System.out.println("Message received from the server : " +response);
+                if(response!=null)
+                approved=true;
 //            ContentResolver cr = context.getContentResolver();
 //            InputStream inputStream = null;
 //            inputStream = cr.openInputStream(Uri.parse("path/to/picture.jpg"));
 //            while ((len = inputStream.read(buf)) != -1) {
 //                outputStream.write(buf, 0, len);
 //            }
-                outputStream.close();
+//                outputStream.close();
+                is.close();
+//                outputStream.close();
+
 //            inputStream.close();
-            } catch (FileNotFoundException e) {
+            }catch (SocketTimeoutException e){
+                try {
+                    socket.close();
+                    Log.e("exception",e.toString());
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+            catch (FileNotFoundException e) {
                 //catch logic
             } catch (IOException e) {
                 //catch logic

@@ -43,20 +43,30 @@ public class ServerClient {
             return null;
         }
     }
+
+
+
+
     public static class Send extends AsyncTask {
         String hello, host;
         Context context;
+        int port,timeout;
 
-        public Send(Context context, String hello, String host,int port) {
+        public Send(Context context, String hello, String host,int port,int timeout) {
             this.hello = hello;
             this.host = host;
             this.context = context;
+            this.port = port;
         }
 
+        @Override
+        protected void onPostExecute(Object o) {
+            Log.e("sent","told client to join quiz");
+        }
 
         @Override
         protected Object doInBackground(Object[] objects) {
-            int port = 8888;
+
             int len;
             Socket socket = new Socket();
             byte buf[] = new byte[1024];
@@ -66,7 +76,7 @@ public class ServerClient {
                  * port, and timeout information.
                  */
                 socket.bind(null);
-                socket.connect((new InetSocketAddress(host, port)), 500);
+                socket.connect((new InetSocketAddress(host, port)), timeout);
 
                 /**
                  * Create a byte stream from a JPEG file and pipe it to the output stream

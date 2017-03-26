@@ -28,8 +28,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -178,7 +181,7 @@ public class CreateHotspot extends AppCompatActivity{
                     dialog.setMessage("Please Wait...");
                     dialog.show();
                     for (Map.Entry<String, String> entry : players.entrySet()) {
-                        new ServerClient.Send(CreateHotspot.this,"quiz_started",entry.getKey(),8888).execute();
+                        new ServerClient.Send(CreateHotspot.this,"quiz_started",entry.getKey(),8081,100).execute();
                     }
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
@@ -189,6 +192,7 @@ public class CreateHotspot extends AppCompatActivity{
                             Intent intent = new Intent(CreateHotspot.this, Quiz.class);
                             intent.putExtra(Constants.INTENT_EXTRA_KEY_QUIZ_TO_PLAY, quizToPlay);
                             intent.putExtra(Constants.INTENT_FINAL_LIST, players);
+                            Log.e("quiz_started ","message sent");
                             startActivity(intent);
 
                         }
@@ -242,6 +246,7 @@ public class CreateHotspot extends AppCompatActivity{
         private String currentClientIP;
         private String responseMessage=" ";
         private String method=" ";
+        private ServerSocket serverSocket;
 
         public FileServerAsyncTask(Context context) {
             this.context = context;
@@ -262,9 +267,9 @@ public class CreateHotspot extends AppCompatActivity{
             super.onPostExecute(o);
             Log.e("player",players.toString());
             connectedClientsNumber.setText(players.keySet().size()+"");
-            if(method.equals("add"))
-            new ServerClient.Send(context,responseMessage,currentClientIP,8888).execute();
-            connectedClientsNumber.setText(players.keySet().size()+"");
+//            if(method.equals("add"))
+//            new ServerClient.Send(context,responseMessage,currentClientIP,8888).execute();
+//            connectedClientsNumber.setText(players.keySet().size()+"");
             if(!isCancelled()){
                 Log.e("new receiver","created");
             task=new FileServerAsyncTask(context);
@@ -287,7 +292,8 @@ public class CreateHotspot extends AppCompatActivity{
                  * Create a server socket and wait for client connections. This
                  * call blocks until a connection is accepted from a client
                  */
-                ServerSocket serverSocket = new ServerSocket(8888);
+                serverSocket = new ServerSocket(8888);
+                serverSocket.setSoTimeout(100);
                 Socket client = serverSocket.accept();
 
 
@@ -304,26 +310,44 @@ public class CreateHotspot extends AppCompatActivity{
 //                    dirs.mkdirs();
 //                f.createNewFile();
                 BufferedReader r = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                StringBuilder total = new StringBuilder();
-                String line;
-                while ((line = r.readLine()) != null) {
-                    total.append(line).append('\n');
-                }
-                text = total.toString();
+//                StringBuilder total = new StringBuilder();
+//                String line;
+//                while ((line = r.readLine()) != null) {
+//                    Log.e("total",total.toString());
+//                    total.append(line).append('\n');
+//                }
+                text = r.readLine();
+                Log.e("text",text);
                 JSONObject received = new JSONObject(text);
                 method = received.getString("method");
+                Log.e("received",received.toString());
                 if(received.get("method").equals("add"))
                 {
                     String name = received.getString("name");
                     String ip = client.getInetAddress().toString().substring(1);
                     players.put(ip,name);
                     responseMessage="Successfully added!";
+                    OutputStream os = client.getOutputStream();
+                    OutputStreamWriter osw = new OutputStreamWriter(os);
+                    BufferedWriter bw = new BufferedWriter(osw);
+                    bw.write(responseMessage);
+                    System.out.println("Message sent to the client is "+responseMessage);
+                    bw.flush();
+                    os.close();
                 }
                 else if(received.get("method").equals("remove")){
                     String ip = client.getInetAddress().toString().substring(1);
                     players.remove(ip);
                     responseMessage = "Successfully removed!";
+                    OutputStream os = client.getOutputStream();
+                    OutputStreamWriter osw = new OutputStreamWriter(os);
+                    BufferedWriter bw = new BufferedWriter(osw);
+                    bw.write(responseMessage);
+                    System.out.println("Message sent to the client is "+responseMessage);
+                    bw.flush();
+                    os.close();
                 }
+
 //                    players.add(new Player(received.getString("name"),client.getInetAddress().toString().substring(1)));
                 currentClientIP = client.getInetAddress().toString().substring(1);
 
@@ -334,6 +358,11 @@ public class CreateHotspot extends AppCompatActivity{
                 return null;
             } catch (IOException e) {
                 Log.e("error", e.getMessage());
+                try {
+                    serverSocket.close();
+                } catch (IOException e1) {
+                    Log.e("error2", e.getMessage());
+                }
                 return null;
             } catch (JSONException e) {
                 e.printStackTrace();

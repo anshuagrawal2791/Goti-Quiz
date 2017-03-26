@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -46,8 +47,8 @@ public class Waiting extends AppCompatActivity {
         mWifiManager = (WifiManager)getBaseContext().getSystemService(Context.WIFI_SERVICE);
         wifiApControl= WifiApControl.getApControl(mWifiManager,this);
 
-//        task=new LongReceive(this);
-//        task.execute();
+        task=new LongReceive(this);
+        task.execute();
     }
 
     @Override
@@ -60,7 +61,7 @@ public class Waiting extends AppCompatActivity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-//                task.cancel(true);
+                task.cancel(true);
 //                new ServerClient.CloseSocket(Waiting.this,8081).execute();
                 wifiApControl.getClientList(Waiting.this, true, 3000, new WifiApControl.FinishScanListener() {
                     @Override
@@ -92,9 +93,9 @@ public class Waiting extends AppCompatActivity {
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-//                task.cancel(true);
-//                task = new LongReceive(Waiting.this);
-//                task.execute();
+                task.cancel(true);
+                task = new LongReceive(Waiting.this);
+                task.execute();
                 dialogInterface.dismiss();
             }
         });
@@ -296,6 +297,12 @@ public class Waiting extends AppCompatActivity {
         }
 
         @Override
+        protected void onCancelled() {
+            Log.e("onCancelled","called");
+            super.onCancelled();
+        }
+
+        @Override
         protected Object doInBackground(Object[] objects) {
             try {
 
@@ -304,29 +311,33 @@ public class Waiting extends AppCompatActivity {
                  * call blocks until a connection is accepted from a client
                  */
 
-                ServerSocket serverSocket = new ServerSocket(8888);
-//                serverSocket.setSoTimeout(1000);
-//                while(!isCancelled()) {
-//                    try {
+                ServerSocket serverSocket = new ServerSocket(8081);
+                serverSocket.setSoTimeout(1000);
+                while(!isCancelled()) {
+                    try {
                         Socket client = serverSocket.accept();
-                        BufferedReader r = new BufferedReader(new InputStreamReader(client.getInputStream()));
+//                        BufferedReader r = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                        InputStream is = client.getInputStream();
+                        InputStreamReader isr = new InputStreamReader(is);
+                        BufferedReader br = new BufferedReader(isr);
                         StringBuilder total = new StringBuilder();
                         String line;
-                        while ((line = r.readLine()) != null) {
+                        while ((line = br.readLine()) != null) {
                             total.append(line).append('\n');
                         }
 
                         text = total.toString();
                         text += client.getInetAddress();
-                        Log.e("qyi","quiz started");
-//                        break;
-//                    }catch (SocketTimeoutException e){
-//                        Log.e("timeout","timeout");
-//                    }
+                        Log.e("qyi",text);
+                        is.close();
+                        break;
+                    }catch (SocketTimeoutException e){
+                        Log.e("timeout","timeout");
+                    }
 //                InputStream inputstream = client.getInputStream();
 //                copyFile(inputstream, new FileOutputStream(f));
 
-//                }
+                }
 
 
                 /**
