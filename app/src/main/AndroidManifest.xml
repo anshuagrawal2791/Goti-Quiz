@@ -30,7 +30,9 @@
         <activity android:name=".Teacher.CreateHotspot" />
         <activity android:name=".Teacher.Quiz" />
         <activity android:name=".Student.Waiting" />
-        <activity android:name=".Student.Quiz"></activity>
+        <activity android:name=".Student.Quiz" />
+        <activity android:name=".Teacher.Results" />
+        <activity android:name=".Student.Results"></activity>
     </application>
 
 </manifest>

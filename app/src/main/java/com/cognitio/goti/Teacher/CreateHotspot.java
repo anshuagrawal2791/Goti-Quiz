@@ -53,6 +53,7 @@ public class CreateHotspot extends AppCompatActivity{
     Timer t;
     ArrayList<String> finalList;
     String quizToPlay;
+
 //    static TreeSet<Player> players;
     static HashMap<String,String> players;
     FileServerAsyncTask task;
@@ -78,50 +79,22 @@ public class CreateHotspot extends AppCompatActivity{
         start = (Button)findViewById(R.id.start);
         mWifiManager = (WifiManager)getBaseContext().getSystemService(Context.WIFI_SERVICE);
         wifiApControl= WifiApControl.getApControl(mWifiManager,this);
-        create.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(hotspotName.getText().toString().matches("")){
-                    hotspotName.setError("Enter Hotspot Name");
-                }
-                else if(hotspotPassword.getText().toString().matches("")){
-                    hotspotPassword.setError("Enter Password");
-                }
-                else if(hotspotPassword.getText().toString().length()<8){
-                    hotspotPassword.setError("Minimum 8 Characters");
-                }
-                else{
-
-                    final WifiConfiguration wifiCon = new WifiConfiguration();
-                    wifiCon.SSID = hotspotName.getText().toString();
-                    wifiCon.preSharedKey = hotspotPassword.getText().toString();
-                    wifiCon.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
-                    wifiCon.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-                    wifiCon.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
-
-                    wifiCon.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-                    wifiApControl.setWifiApEnabled(wifiCon,false);
-                    final ProgressDialog dialog = new ProgressDialog(CreateHotspot.this);
-                    dialog.setMessage("creating...");
-                    dialog.show();
 
 
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        public void run() {
-                            dialog.dismiss();
-                            if(wifiApControl.setWifiApEnabled(wifiCon,true)){
-                                text.setVisibility(View.GONE);
-                                hotspotName.setVisibility(View.GONE);
-                                hotspotPassword.setVisibility(View.GONE);
-                                create.setVisibility(View.GONE);
-                                status.setText("Created");
-                                status.setVisibility(View.VISIBLE);
-                                start.setVisibility(View.VISIBLE);
-                                connectedClientsTv.setVisibility(View.VISIBLE);
-                                connectedClientsNumber.setVisibility(View.VISIBLE);
 
-                                players = new HashMap<String, String>();
+
+        ///remove this block
+        text.setVisibility(View.GONE);
+        hotspotName.setVisibility(View.GONE);
+        hotspotPassword.setVisibility(View.GONE);
+        create.setVisibility(View.GONE);
+        status.setText("Created");
+        status.setVisibility(View.VISIBLE);
+        start.setVisibility(View.VISIBLE);
+        connectedClientsTv.setVisibility(View.VISIBLE);
+        connectedClientsNumber.setVisibility(View.VISIBLE);
+
+        players = new HashMap<String, String>();
 
 //                                task = new FileServerAsyncTask(CreateHotspot.this){
 //                                    @Override
@@ -132,37 +105,99 @@ public class CreateHotspot extends AppCompatActivity{
 //                                    }
 //                                };
 //                                task.execute();
-                                task=new FileServerAsyncTask(CreateHotspot.this);
-                                task.execute();
+        task=new FileServerAsyncTask(CreateHotspot.this);
+        task.execute();
 
 
-//                                try {
-////                                    serverSocket = new ServerSocket(8888);
-//                                } catch (IOException e) {
-//                                    e.printStackTrace();
-//                                }
-//                                new FileServerAsyncTask(CreateHotspot.this).execute();
-//                                refresh.setVisibility(View.VISIBLE);
-//                                t = new Timer();
-////Set the schedule function and rate
-//                                final int[] n = {0};
-//                                t.scheduleAtFixedRate(new TimerTask() {
-//                                    @Override
-//                                    public void run() {
-//                                        getClientList();
+
+        ////////////uncomment this block
+
+
+//        create.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(hotspotName.getText().toString().matches("")){
+//                    hotspotName.setError("Enter Hotspot Name");
+//                }
+//                else if(hotspotPassword.getText().toString().matches("")){
+//                    hotspotPassword.setError("Enter Password");
+//                }
+//                else if(hotspotPassword.getText().toString().length()<8){
+//                    hotspotPassword.setError("Minimum 8 Characters");
+//                }
+//                else{
 //
-//                                    }
-//                                }, 4000, 4000);
-                            }
-                        }
-                    }, 10000);
-
-
-
-
-                }
-            }
-        });
+//                    final WifiConfiguration wifiCon = new WifiConfiguration();
+//                    wifiCon.SSID = hotspotName.getText().toString();
+//                    wifiCon.preSharedKey = hotspotPassword.getText().toString();
+//                    wifiCon.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
+//                    wifiCon.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+//                    wifiCon.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+//
+//                    wifiCon.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+//                    wifiApControl.setWifiApEnabled(wifiCon,false);
+//                    final ProgressDialog dialog = new ProgressDialog(CreateHotspot.this);
+//                    dialog.setMessage("creating...");
+//                    dialog.show();
+//
+//
+//                    Handler handler = new Handler();
+//                    handler.postDelayed(new Runnable() {
+//                        public void run() {
+//                            dialog.dismiss();
+//                            if(wifiApControl.setWifiApEnabled(wifiCon,true)){
+//                                text.setVisibility(View.GONE);
+//                                hotspotName.setVisibility(View.GONE);
+//                                hotspotPassword.setVisibility(View.GONE);
+//                                create.setVisibility(View.GONE);
+//                                status.setText("Created");
+//                                status.setVisibility(View.VISIBLE);
+//                                start.setVisibility(View.VISIBLE);
+//                                connectedClientsTv.setVisibility(View.VISIBLE);
+//                                connectedClientsNumber.setVisibility(View.VISIBLE);
+//
+//                                players = new HashMap<String, String>();
+//
+////                                task = new FileServerAsyncTask(CreateHotspot.this){
+////                                    @Override
+////                                    protected void onPostExecute(Object o) {
+////                                        Log.e("players",players.toString());
+//////                                        task.execute();
+////                                        new FileServerAsyncTask(CreateHotspot.this).execute();
+////                                    }
+////                                };
+////                                task.execute();
+//                                task=new FileServerAsyncTask(CreateHotspot.this);
+//                                task.execute();
+//
+//
+////                                try {
+//////                                    serverSocket = new ServerSocket(8888);
+////                                } catch (IOException e) {
+////                                    e.printStackTrace();
+////                                }
+////                                new FileServerAsyncTask(CreateHotspot.this).execute();
+////                                refresh.setVisibility(View.VISIBLE);
+////                                t = new Timer();
+//////Set the schedule function and rate
+////                                final int[] n = {0};
+////                                t.scheduleAtFixedRate(new TimerTask() {
+////                                    @Override
+////                                    public void run() {
+////                                        getClientList();
+////
+////                                    }
+////                                }, 4000, 4000);
+//                            }
+//                        }
+//                    }, 10000);
+//
+//
+//
+//
+//                }
+//            }
+//        });
 //        refresh.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -233,6 +268,7 @@ public class CreateHotspot extends AppCompatActivity{
 
     @Override
     protected void onDestroy() {
+        if(task!=null)
         task.cancel(true);
         super.onDestroy();
 
@@ -293,7 +329,7 @@ public class CreateHotspot extends AppCompatActivity{
                  * call blocks until a connection is accepted from a client
                  */
                 serverSocket = new ServerSocket(8888);
-                serverSocket.setSoTimeout(100);
+                serverSocket.setSoTimeout(2000);
                 Socket client = serverSocket.accept();
 
 

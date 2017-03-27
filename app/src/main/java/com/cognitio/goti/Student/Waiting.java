@@ -20,11 +20,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -40,13 +42,15 @@ public class Waiting extends AppCompatActivity {
     FileServerAsyncTask receiveTask;
     Send senTask;
     LongReceive task;
+    String server;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_waiting);
         mWifiManager = (WifiManager)getBaseContext().getSystemService(Context.WIFI_SERVICE);
         wifiApControl= WifiApControl.getApControl(mWifiManager,this);
-
+        Intent intent = getIntent();
+        server = intent.getStringExtra("server");
         task=new LongReceive(this);
         task.execute();
     }
@@ -126,6 +130,7 @@ public class Waiting extends AppCompatActivity {
             super.onPostExecute(o);
             if(text!=null) {
                 Log.e("response", text);
+//                Intent intent = new Intent(context,StudentHome.class);
                 Toast.makeText(context,text,Toast.LENGTH_LONG).show();
                 context.startActivity(new Intent(context,StudentHome.class));
             }
@@ -215,7 +220,9 @@ public class Waiting extends AppCompatActivity {
             super.onPostExecute(o);
             Log.e("sent","sent");
 
-            context.startActivity(new Intent(context,StudentHome.class));
+            Intent intent = new Intent(context,StudentHome.class);
+            intent.putExtra("server",server);
+            context.startActivity(intent);
 //            if(receiveTask!=null)
 //                receiveTask.cancel(true);
 //            receiveTask = new FileServerAsyncTask(Waiting.this);
@@ -276,9 +283,14 @@ public class Waiting extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        if(task!=null)
+            task.cancel(true);
+        super.onDestroy();
+    }
 
-
-    public static class LongReceive extends AsyncTask {
+    public class LongReceive extends AsyncTask {
 
         private Context context;
         private TextView statusText;
@@ -293,7 +305,9 @@ public class Waiting extends AppCompatActivity {
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
             Log.e("quiz started",text);
-            context.startActivity(new Intent(context,Quiz.class));
+            Intent intent = new Intent(context,Quiz.class);
+            intent.putExtra("server",server);
+            context.startActivity(intent);
         }
 
         @Override
@@ -317,19 +331,25 @@ public class Waiting extends AppCompatActivity {
                     try {
                         Socket client = serverSocket.accept();
 //                        BufferedReader r = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                        InputStream is = client.getInputStream();
-                        InputStreamReader isr = new InputStreamReader(is);
-                        BufferedReader br = new BufferedReader(isr);
-                        StringBuilder total = new StringBuilder();
-                        String line;
-                        while ((line = br.readLine()) != null) {
-                            total.append(line).append('\n');
-                        }
-
-                        text = total.toString();
-                        text += client.getInetAddress();
+                        BufferedReader r = new BufferedReader(new InputStreamReader(client.getInputStream()));
+//                StringBuilder total = new StringBuilder();
+//                String line;
+//                while ((line = r.readLine()) != null) {
+//                    Log.e("total",total.toString());
+//                    total.append(line).append('\n');
+//                }
+                        text = r.readLine();
                         Log.e("qyi",text);
-                        is.close();
+
+                        OutputStream os = client.getOutputStream();
+                        OutputStreamWriter osw = new OutputStreamWriter(os);
+                        BufferedWriter bw = new BufferedWriter(osw);
+                        bw.write("joined");
+                        bw.newLine();
+                        bw.flush();
+
+                        os.close();
+//                        is.close();
                         break;
                     }catch (SocketTimeoutException e){
                         Log.e("timeout","timeout");

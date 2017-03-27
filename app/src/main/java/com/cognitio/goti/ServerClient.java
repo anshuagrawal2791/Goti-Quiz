@@ -9,10 +9,13 @@ import android.widget.TextView;
 import com.cognitio.goti.Student.Waiting;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -51,17 +54,30 @@ public class ServerClient {
         String hello, host;
         Context context;
         int port,timeout;
+        String response;
+        Boolean joined=false;
+        int maxRetry=5;
 
         public Send(Context context, String hello, String host,int port,int timeout) {
             this.hello = hello;
             this.host = host;
             this.context = context;
             this.port = port;
+            this.timeout=timeout;
+
         }
 
         @Override
         protected void onPostExecute(Object o) {
-            Log.e("sent","told client to join quiz");
+            if(joined){
+            Log.e("sent","client joined");}
+            else{
+                Log.e("sent","didn't joing");
+                maxRetry--;
+                if(maxRetry>0)
+                new Send(context,hello,host,port,timeout).execute();
+            }
+
         }
 
         @Override
@@ -82,16 +98,37 @@ public class ServerClient {
                  * Create a byte stream from a JPEG file and pipe it to the output stream
                  * of the socket. This data will be retrieved by the server device.
                  */
-                OutputStream outputStream = socket.getOutputStream();
-                outputStream.write(hello.getBytes(Charset.forName("UTF-8")));
+//                OutputStream outputStream = socket.getOutputStream();
+//                outputStream.write(hello.getBytes(Charset.forName("UTF-8")));
+
+
+                OutputStream os = socket.getOutputStream();
+                OutputStreamWriter osw = new OutputStreamWriter(os);
+                BufferedWriter bw = new BufferedWriter(osw);
+                bw.write(hello);
+                bw.newLine();
+                bw.flush();
+
+                InputStream is = socket.getInputStream();
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader br = new BufferedReader(isr);
+                response = br.readLine();
+                System.out.println("Message received from the server : " +response);
+                if(response.equals("joined"))
+                    joined=true;
+                else
+                    joined=false;
+//                if(response!=null)
+//                    approved=true;
 //            ContentResolver cr = context.getContentResolver();
 //            InputStream inputStream = null;
 //            inputStream = cr.openInputStream(Uri.parse("path/to/picture.jpg"));
 //            while ((len = inputStream.read(buf)) != -1) {
 //                outputStream.write(buf, 0, len);
 //            }
-                outputStream.close();
+//                os.close();
 //            inputStream.close();
+                is.close();
             } catch (FileNotFoundException e) {
                 //catch logic
             } catch (IOException e) {
@@ -124,6 +161,7 @@ public class ServerClient {
         private Context context;
         private TextView statusText;
         private String text;
+
 
         public Receive(Context context) {
             this.context = context;

@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cognitio.goti.Adapters.AvailableWifiAdapter;
+import com.cognitio.goti.MainActivity;
 import com.cognitio.goti.Player;
 import com.cognitio.goti.R;
 import com.cognitio.goti.ServerClient;
@@ -50,7 +51,7 @@ public class StudentHome extends AppCompatActivity {
     WifiManager mWifiManager;
 //    FileServerAsyncTask receiveTask;
     Send senTask;
-
+    String server;
     EditText name;
     Button submit_name;
     @Override
@@ -74,6 +75,7 @@ public class StudentHome extends AppCompatActivity {
                         Log.e("clients",resultIPAddr.size()+"");
                         if(resultIPAddr.size()>0)
                         for(int i=0;i<resultIPAddr.size();i++) {
+                            server = resultIPAddr.get(i);
                             if(senTask!=null)
                                 senTask.cancel(true);
 
@@ -219,7 +221,9 @@ public class StudentHome extends AppCompatActivity {
             Log.e("sent","sent");
             if(approved){
             Toast.makeText(context,"You're added!",Toast.LENGTH_LONG).show();
-            context.startActivity(new Intent(context,Waiting.class));}
+                Intent intent = new Intent(context,Waiting.class);
+                intent.putExtra("server",host);
+            context.startActivity(intent);}
             else{
                 Toast.makeText(context,"you don't seem to be connected to the right hotspot",Toast.LENGTH_LONG).show();
             }
@@ -320,6 +324,13 @@ public class StudentHome extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+//        super.onBackPressed();
+    }
 }
 
 

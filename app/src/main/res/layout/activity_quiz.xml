@@ -1,13 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_quiz"
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.cognitio.goti.Teacher.Quiz">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#1f2329">
 
-</RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/timer"
+            android:hint="Enter Time in Seconds (max 60)"
+            android:background="@android:color/white"
+            android:inputType="number"
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/questiont"
+        android:layout_margin="20dp"
+        android:textSize="20dp"
+        android:gravity="center_horizontal"
+        android:textColor="#ffffff" />
+    <!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="horizontal">-->
+
+
+    <!--<ProgressBar-->
+    <!--style="@android:style/Widget.ProgressBar.Horizontal"-->
+    <!--android:layout_centerInParent="true"-->
+    <!--android:layout_width="10dp"-->
+    <!--android:layout_margin="10dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:max="10"-->
+    <!--android:progress="0"-->
+    <!--android:id="@+id/playerprogressbar"-->
+    <!--android:progressDrawable="@drawable/progress_drawable" />-->
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        >
+
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/optionAt"
+            android:layout_margin="5dp"
+            android:visibility="gone"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/optionBt"
+            android:layout_margin="5dp"
+            android:visibility="gone"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/optionCt"
+            android:layout_margin="5dp"
+            android:visibility="gone"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/optionDt"
+            android:layout_margin="5dp"
+            android:visibility="gone"
+            />
+        <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/creditstv"-->
+        <!--android:textSize="15dp"-->
+        <!--android:textColor="#ffffff" />-->
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/push_question"
+            android:text="Push"
+            android:background="@android:color/white"/>
+
+    </LinearLayout>
+
+    <!--<ProgressBar-->
+    <!--style="@android:style/Widget.ProgressBar.Horizontal"-->
+    <!--android:layout_centerInParent="true"-->
+    <!--android:layout_width="10dp"-->
+    <!--android:layout_margin="10dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:max="10"-->
+    <!--android:progress="0"-->
+    <!--android:id="@+id/compprogressbar"-->
+    <!--android:progressDrawable="@drawable/progress_drawable" />-->
+
+
+    <!--</LinearLayout>-->
+
+
+
+
+
+
+
+
+</LinearLayout>
