@@ -125,6 +125,7 @@ public class Quiz extends AppCompatActivity {
                         }
                         if (current <= numOfQuestions) {
 //                    waitingResponse.show();
+                            numOfResponses=0;
                             final ProgressDialog dialog = new ProgressDialog(Quiz.this);
                             dialog.show();
                             for (Map.Entry<String, String> entry : players.entrySet()) {
